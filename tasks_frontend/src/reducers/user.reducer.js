@@ -3,7 +3,8 @@ import { userConstants } from '../constants'
 const initialState = {
   loggedIn: false,
   user: {},
-  userToken: ''
+  userToken: '',
+  error: ''
 }
 
 export function user(state = initialState, action) {
@@ -36,7 +37,7 @@ export function user(state = initialState, action) {
     case userConstants.REGISTER_SUCCESS:
       return {
         ...state,
-        user: action.user.userData,
+        user: action.user,
         loading: false
       }
     case userConstants.REGISTER_FAILURE:

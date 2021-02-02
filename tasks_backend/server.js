@@ -4,7 +4,7 @@ import express from 'express';
 import bodyParser from 'body-parser'
 import cors from 'cors';
 import Router from './routes/router';
-
+import config from './config'
 const server = express();
 
 // parse application/x-www-form-urlencoded

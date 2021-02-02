@@ -1,8 +1,9 @@
 import axios from 'axios'
+import config from '../config/config'
 
 const login = async (email, password) => {
   try {
-    const url = `http://localhost:5000/api/users/login`
+    const url = `${config.API_URL}/login`
     const data = {
       email,
       password
@@ -17,7 +18,7 @@ const login = async (email, password) => {
 
 const logout = async (email) => {
   try {
-    const url = `http://localhost:5000/api/users/logout`
+    const url = `${config.API_URL}/logout`
     const data = {
       email
     }
@@ -38,14 +39,13 @@ const register = async (
   userType
 ) => {
   try {
-    const url = `http://localhost:5000/api/users/register`
+    const url = `${config.API_URL}/register`
     const data = {
       firstName: firstname,
       lastName: lastname,
       userName: username,
       email,
-      password,
-      role: userType
+      password
     }
     const response = await axios.post(url, data)
     if (response) return response.data
@@ -57,12 +57,13 @@ const register = async (
 
 const verifyEmail = async (token) => {
   try {
-    const url = `http://localhost:5000/api/users/verify-email`
+    const url = `${config.API_URL}/verify-email`
     const headers = {
+      'Content-Type': 'application/json',
       token
-    }
+    };
 
-    const response = await axios.post(url, headers, {})
+    const response = await axios.post(url, {}, {headers})
     if (response) return response.data
     return false
   } catch (err) {

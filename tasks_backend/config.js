@@ -25,7 +25,7 @@ export default {
     },
     mailOptions: {
         mailFrom: "Hamendra <tasks@gmail.com>",
-        subject: "Registration Verification | My Score",
+        subject: "Registration Verification | Tasks",
         html: "<h1>Please verify your email by clicking below link: </h1>"
     },
 

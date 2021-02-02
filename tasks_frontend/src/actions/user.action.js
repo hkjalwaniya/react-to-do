@@ -26,12 +26,12 @@ const login = (email, password) => {
   }
 }
 
-const register = (firstname, lastname, username, email, password, userType) => {
+const register = (firstname, lastname, username, email, password) => {
   const request = (reqEmail) => {
     return { type: userConstants.REGISTER_REQUEST, reqEmail }
   }
-  const success = (user) => {
-    return { type: userConstants.REGISTER_SUCCESS, user }
+  const success = (reqEmail) => {
+    return { type: userConstants.REGISTER_SUCCESS, reqEmail }
   }
   const failure = (error) => {
     return { type: userConstants.REGISTER_FAILURE, error }
@@ -44,12 +44,11 @@ const register = (firstname, lastname, username, email, password, userType) => {
         lastname,
         username,
         email,
-        password,
-        userType
+        password
       )
       if (response.success === true) {
-        dispatch(success(response.user))
         history.push(`/login`)
+        dispatch(success(email))
       }
     } catch (err) {
       dispatch(failure(err))

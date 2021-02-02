@@ -47,6 +47,6 @@ exports.sendEmail = async (email, html, subject ) => {
         });
         return true;
     } catch (err) {
-        throw new Error(err);
+      throw new Error(err);
     }
 }

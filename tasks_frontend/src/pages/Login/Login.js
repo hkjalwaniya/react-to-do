@@ -16,13 +16,15 @@ import CopyRight from '../../components/atoms/CopyRight'
 import TasksTextField from '../../components/atoms/TasksTextField'
 import TasksButton from '../../components/atoms/TasksButton'
 import TasksLogo from '../../components/atoms/TasksLogo'
+import TasksSnackBar from '../../components/atoms/TasksSnackBar'
 
 class Login extends Component {
   constructor(props) {
     super(props)
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      formSubmitted: false
     }
   }
 
@@ -33,6 +35,7 @@ class Login extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault()
+    this.setState({ formSubmitted: true })
     const { email, password } = this.state
     const { dispatch } = this.props
     if (email && password) {
@@ -40,14 +43,27 @@ class Login extends Component {
     }
   }
 
+  handleSnackBarClose = () => {
+    this.setState({ formSubmitted: false })
+  }
+
   render() {
-    const { loggedIn, classes } = this.props
+    const { loggedIn, classes, error } = this.props
+    const { formSubmitted } = this.state
     if (loggedIn) {
       return <Redirect to="/dashboard" />
     }
     return (
       <>
         <Grid container component="main" className={classes.root}>
+          {
+            error.message && <TasksSnackBar
+              isOpen={formSubmitted}
+              handleSnackBarClose={this.handleSnackBarClose}
+              severity="error"
+              message={error.message}
+            />
+          }
           <CssBaseline />
           <Grid item xs={false} sm={4} md={7} className={classes.image} />
           <Grid

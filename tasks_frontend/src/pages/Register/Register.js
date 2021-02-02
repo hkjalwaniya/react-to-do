@@ -12,8 +12,8 @@ import styles from './styles'
 import CopyRight from '../../components/atoms/CopyRight'
 import TasksTextField from '../../components/atoms/TasksTextField'
 import TasksButton from '../../components/atoms/TasksButton'
-import DropDown from '../../components/atoms/DropDown'
 import TasksLogo from '../../components/atoms/TasksLogo'
+import TasksSnackBar from '../../components/atoms/TasksSnackBar'
 
 class Register extends Component {
   constructor(props) {
@@ -24,7 +24,7 @@ class Register extends Component {
       username: '',
       email: '',
       password: '',
-      userType: ''
+      formSubmitted: false
     }
   }
 
@@ -40,34 +40,55 @@ class Register extends Component {
       lastname,
       username,
       email,
-      password,
-      userType
+      password
     } = this.state
     const { dispatch } = this.props
-    if (firstname && lastname && username && email && password && userType) {
+    if (firstname && lastname && username && email && password) {
+      this.setState({ formSubmitted: true })
       dispatch(
         userActions.register(
           firstname,
           lastname,
           username,
           email,
-          password,
-          userType
+          password
         )
       )
     }
   }
 
-  handleUserTypeSelection = (e) => {
-    e.preventDefault()
-    this.setState({ userType: e.target.value })
+  handleSnackBarClose = () => {
+    this.setState({ formSubmitted: false })
   }
 
   render() {
-    const { classes } = this.props
-    const { userType } = this.state
+    const { classes, error } = this.props
+    const { formSubmitted } = this.state
     return (
       <Grid container component="main" className={classes.root}>
+        {
+          formSubmitted && error && error.message &&
+          <TasksSnackBar
+            isOpen={formSubmitted}
+            handleSnackBarClose={this.handleSnackBarClose}
+            severity="error"
+            message={error.message}
+          />
+        }
+        { formSubmitted && Object.keys(error).length < 1 &&
+          <TasksSnackBar
+            isOpen={formSubmitted}
+            handleSnackBarClose={this.handleSnackBarClose}
+            severity="success"
+            message={error.message}
+          />
+        }
+        <TasksSnackBar
+          isOpen={formSubmitted}
+          handleSnackBarClose={this.handleSnackBarClose}
+          severity="success"
+          message="Registered Successfully, Please verify your email address to continue!!!"
+        />
         <CssBaseline />
         <Grid item xs={false} sm={4} md={7} className={classes.image} />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
@@ -137,16 +158,6 @@ class Register extends Component {
                 id="password"
                 autoComplete="current-password"
                 onChange={this.handleChange}
-              />
-              <DropDown
-                handleSelection={this.handleUserTypeSelection}
-                inputLabel="Signup As"
-                value={userType}
-                selectOptions={[
-                  { value: 'User', id: 0 },
-                  { value: 'Admin', id: 1 }
-                ]}
-                isRequired
               />
               <TasksButton
                 type="submit"

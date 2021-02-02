@@ -22,10 +22,10 @@ exports.sendVerificationEmail = async (req, res) => {
 
         const html = `
             Dear ${user.firstName} <br/>
-            Thank you for the registration with <a href=${config.FRONT_END_URL}>My Score</a> <br/>
+            Thank you for the registration with <a href=${config.FRONT_END_URL}>Tasks</a> <br/>
             Please <a href='${verificationUrl}'> click here</a> to verify your email address.<br/>
             Regards,<br/>
-            <a href=${config.FRONT_END_URL}>My Score</a>  Team
+            <a href=${config.FRONT_END_URL}>Tasks</a>  Team
         `;
 
         const isEmailSent = await sendEmail(user.email, html, config.mailOptions.subject);
@@ -62,8 +62,7 @@ exports.register = async (req, res, next) => {
             lastName: req.body.lastName,
             userName: req.body.userName,
             email: req.body.email,
-            password: req.body.password,
-            role: req.body.role || 'User'
+            password: req.body.password
         });
         const userExistsQuery = {
             $or: [
@@ -93,8 +92,7 @@ exports.register = async (req, res, next) => {
             firstName: user.firstName,
             lastName: user.lastName,
             userName: user.userName,
-            email: user.email,
-            role: user.role
+            email: user.email
         }
 
         const savedUser = await user.save();
@@ -124,47 +122,55 @@ exports.register = async (req, res, next) => {
  */
 exports.login = async (req, res) => {
     try {
-        if (!req.body.email) throw Error('Email is required!!!');
-        if (!req.body.password) throw Error('Password is required!!!');
-        const userExistsQuery = {
-            email: req.body.email
-        };
+      if (!req.body.email) throw Error('Email is required!!!');
+      if (!req.body.password) throw Error('Password is required!!!');
+      const userExistsQuery = {
+          email: req.body.email
+      };
 
-        const user = await User.findOne(userExistsQuery);
-        if (!user) throw Error('User does not exist');
+      const user = await User.findOne(userExistsQuery);
+      if (!user) throw Error('User does not exist');
+      if (user.isEmailVerified) {
         //Match user password from database.
         const match = await bcrypt.compare(req.body.password, user.password);
         if (!match) throw Error('Invalid credentials');
 
         const payload = {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            userName: user.userName,
-            email: user.email,
-            role: user.role
+          firstName: user.firstName,
+          lastName: user.lastName,
+          userName: user.userName,
+          email: user.email
         }
+
         //create access_token for user
         const token = jwt.sign({
-            data: payload
+          data: payload
         }, config.SECRET.JWT, { expiresIn: '1h' });
-        user.access_token = token;
 
+        user.access_token = token;
         await user.save();
+
         res.status(200).json({
-            success: true,
-            message: 'log in successful',
-            user: {
-              userData: payload,
-              userToken: token
-            }
+          success: true,
+          message: 'log in successful',
+          user: {
+            userData: payload,
+            userToken: token
+          }
         })
+      } else {
+        res.status(401).json({
+          success: false,
+          message: 'Your email is not verified. Please verify your email first'
+        })
+      }
     } catch (err) {
         logger.error(`users/login/err- 400 - Could not login user => ${JSON.stringify(err)}`);
         res.status(400).json({
           success: false,
           message: err.message
         });
-    }
+      }
 }
 
 /**
@@ -219,8 +225,7 @@ exports.getProfile = async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             userName: user.userName,
-            email: user.email,
-            role: user.role
+            email: user.email
         }
 
         res.status(200).json({
@@ -243,11 +248,55 @@ exports.getProfile = async (req, res) => {
  */
 exports.verifyEmail = async (req, res) => {
     try {
-      console.log('req, res',req.headers);
+        const { token } = req.headers;
+        const parts = token.split('-');
+        if(parts.length === 2) {
+            const verificationCode = parts[0];
+            const userId = Buffer.from(parts[1], 'base64').toString();
+            const findUserQuery = {
+                '_id': userId
+            };
 
+            const user = await User.findOne(findUserQuery);
+            if (user) {
+                if (user.isEmailVerified) {
+                    res.status(200).json({
+                        success: true,
+                        message: 'Your email has already been verified'
+                    });
+                }
+                const encodedEmailVerificationCode = crypto.createHash('md5').update(user.emailVerificationCode.code.toString()).digest('hex');
+                if(encodedEmailVerificationCode === verificationCode) {
+                    user.emailVerificationCode.code = 0;
+                    user.emailVerificationCode.count = 0;
+                    user.isEmailVerified = true;
+                    await user.save()
+                    return res.status(200).json({
+                        success: true,
+                        message: 'Email verified successfully!'
+                    });
+                } else {
+                    return res.status(401).json({
+                        success: false,
+                        message: 'The email link has expired!'
+                    });
+                }
+
+            } else {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid Token'
+                });
+            }
+        } else {
+            res.status(401).json({
+                success: false,
+                message: 'Invalid Token'
+            });
+        }
     } catch (err) {
         logger.error(`users/verify-email/err- 400 - Could not verify user email => ${JSON.stringify(err)}`);
-        res.status(400).json({
+        res.status(500).json({
           success: false,
           message: err.message
         });
