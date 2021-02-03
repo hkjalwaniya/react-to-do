@@ -51,7 +51,7 @@ class Login extends Component {
     const { loggedIn, classes, error } = this.props
     const { formSubmitted } = this.state
     if (loggedIn) {
-      return <Redirect to="/dashboard" />
+      return <Redirect to="/tasks" />
     }
     return (
       <>

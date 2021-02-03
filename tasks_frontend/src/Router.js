@@ -6,7 +6,7 @@ import { store } from './store'
 import MainLayout from './pages/MainLayout'
 import Register from './pages/Register'
 import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
+import Tasks from './pages/Tasks'
 import Profile from './pages/Profile'
 import VerifyEmail from './pages/VerifyEmail'
 import { history } from './helpers'
@@ -53,10 +53,10 @@ class MainRouter extends PureComponent {
               component={VerifyEmail}
             />
             <AuthRoute
-              path="/dashboard"
+              path="/tasks"
               layout={MainLayout}
               exact
-              component={Dashboard}
+              component={Tasks}
             />
             <AuthRoute
               path="/profile"

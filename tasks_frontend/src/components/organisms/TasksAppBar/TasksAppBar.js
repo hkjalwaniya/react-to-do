@@ -20,7 +20,6 @@ import { userActions } from '../../../actions'
 import styles from './styles'
 import TasksMenu from '../../blocks/TasksMenu'
 import TasksMobileMenu from '../../blocks/TasksMobileMenu'
-import TasksSideBar from '../TasksSideBar'
 import { history } from '../../../helpers'
 
 class TasksAppBar extends Component {
@@ -28,14 +27,13 @@ class TasksAppBar extends Component {
     super(props)
     this.state = {
       anchorEl: null,
-      mobileMoreAnchorEl: null,
-      isSideBarOpen: false
+      mobileMoreAnchorEl: null
     }
   }
 
   render() {
     const { classes, user } = this.props
-    const { anchorEl, mobileMoreAnchorEl, isSideBarOpen } = this.state
+    const { anchorEl, mobileMoreAnchorEl } = this.state
     const menuId = 'primary-search-account-menu'
     const mobileMenuId = 'primary-search-account-menu-mobile'
 
@@ -70,20 +68,12 @@ class TasksAppBar extends Component {
       handleMenuClose()
     }
 
-    const handleDrawerOpen = () => {
-      this.setState({ isSideBarOpen: true })
-    }
-
-    const handleDrawerClose = () => {
-      this.setState({ isSideBarOpen: false })
-    }
-
     const handleProfile = () => {
       history.push('/profile')
       handleMenuClose()
     }
-    const handleDashboard = () => {
-      history.push('/dashboard')
+    const handleTasks = () => {
+      history.push('/tasks')
       handleMenuClose()
     }
     return (
@@ -92,17 +82,16 @@ class TasksAppBar extends Component {
           <AppBar
             position="fixed"
             className={clsx(classes.appBar, {
-              [classes.appBarShift]: isSideBarOpen
+              [classes.appBarShift]: false
             })}
           >
             <Toolbar>
               <IconButton
                 color="inherit"
                 edge="start"
-                onClick={handleDrawerOpen}
                 className={clsx(
                   classes.menuButton,
-                  isSideBarOpen && classes.hide
+                  false && classes.hide
                 )}
                 aria-label="open drawer"
               >
@@ -175,13 +164,7 @@ class TasksAppBar extends Component {
             handleMenuClose={handleMenuClose}
             handleLogout={handleLogout}
             handleProfile={handleProfile}
-            handleDashboard={handleDashboard}
-          />
-          <TasksSideBar
-            isSideBarOpen={isSideBarOpen}
-            handleDrawerClose={handleDrawerClose}
-            handleProfile={handleProfile}
-            handleDashboard={handleDashboard}
+            handleTasks={handleTasks}
           />
         </div>
       </>

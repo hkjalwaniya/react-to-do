@@ -10,7 +10,7 @@ class TasksMenu extends Component {
       menuId,
       handleLogout,
       handleProfile,
-      handleDashboard
+      handleTasks
     } = this.props
     const isMenuOpen = Boolean(anchorEl)
 
@@ -25,7 +25,7 @@ class TasksMenu extends Component {
         onClose={handleMenuClose}
       >
         <MenuItem onClick={handleProfile}>Profile</MenuItem>
-        <MenuItem onClick={handleDashboard}>Dashboard</MenuItem>
+        <MenuItem onClick={handleTasks}>Tasks</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     )

@@ -18,7 +18,7 @@ const login = (email, password) => {
       const response = await userService.login(email, password)
       if (response.success === true) {
         dispatch(success(response.user))
-        history.push(`/dashboard`)
+        history.push(`/tasks`)
       }
     } catch (err) {
       dispatch(failure(err))

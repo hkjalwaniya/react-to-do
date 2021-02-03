@@ -1,5 +1,5 @@
 const styles = () => ({
-  dashboardWrapper: {}
+  tasksWrapper: {}
 })
 
 export default styles
